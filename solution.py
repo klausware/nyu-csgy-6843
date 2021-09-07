@@ -10,7 +10,7 @@ HOST = "127.0.0.1"
 PORT = 13331
 BUFFER_SIZE = 1024
 
-def webServer(PORT):
+def webServer(port=PORT):
     serverSocket = socket(AF_INET, SOCK_STREAM)
     serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     
