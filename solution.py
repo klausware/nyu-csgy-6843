@@ -15,7 +15,7 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     #print(recv)
     
     if recv[:3] != '220':
-        break
+        sys.exit()
         #print('220 reply not received from server.')
 
     # Send HELO command and print server response.
@@ -24,7 +24,7 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     recv1 = clientSocket.recv(1024).decode()
     #print(recv1)
     if recv1[:3] != '250':
-        break
+        sys.exit()
         #print('1. 250 reply not received from server.')
 
     # Send MAIL FROM command and print server response.
@@ -33,7 +33,7 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     recv1 = clientSocket.recv(1024).decode()
     #print(recv1)
     if recv1[:3] != '250':
-        break
+        sys.exit()
         #print('2. 250 reply not received from server.')
 
     # Send RCPT TO command and print server response.
@@ -42,7 +42,7 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     recv1 = clientSocket.recv(1024).decode()
     #print(recv1)
     if recv1[:3] != '250':
-        break
+        sys.exit()
         #print('3. 250 reply not received from server.')
 
     # Send DATA command and print server response.
@@ -51,7 +51,7 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     recv1 = clientSocket.recv(1024).decode()
     #print(recv1)
     if recv1[:3] != '354':
-        break
+        sys.exit()
         #print('4. 354 reply not received from server.')
 
     # Send message data.
@@ -68,7 +68,7 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     recv1 = clientSocket.recv(1024).decode()
     #print(recv1)
     if recv1[:3] != '250':
-        break
+        sys.exit()
         #print('5. 250 reply not received from server.')
 
     # Send QUIT command and get server response.
@@ -77,7 +77,7 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     recv1 = clientSocket.recv(1024).decode()
     #print(recv1)
     if recv1[:3] != '221':
-        break
+        sys.exit()
         #print('221 reply not received from server.')
 
 
