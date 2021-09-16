@@ -2,7 +2,7 @@ import socket
 
 
 def smtp_client(port=1025, mailserver='127.0.0.1'):
-    msg = "\r\nThis is student nk3338\r\n"
+    msg = "\r\nThis is student nk3338"
     endmsg = "\r\n.\r\n"
 
     # Choose a mail server (e.g. Google mail server) if you want to verify the script beyond GradeScope    
@@ -15,7 +15,8 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     #print(recv)
     
     if recv[:3] != '220':
-        print('220 reply not received from server.')
+        break
+        #print('220 reply not received from server.')
 
     # Send HELO command and print server response.
     heloCommand = 'HELO Klaus\r\n'
