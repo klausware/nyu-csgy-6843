@@ -1,67 +1,79 @@
-#import socket module
 from socket import *
-import sys # In order to terminate the program
-from email.parser import BytesParser
-import email
-import pprint
-from io import StringIO
 
-HOST = "127.0.0.1"
-PORT = 13331
-BUFFER_SIZE = 1024
 
-def webServer(port=PORT):
-    serverSocket = socket(AF_INET, SOCK_STREAM)
-    serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-    
-    #Prepare a sever socket
-    serverSocket.bind((HOST,PORT))
-    serverSocket.listen(1)
+def smtp_client(port=1025, mailserver='127.0.0.1'):
+    msg = "\r\n My message"
+    endmsg = "\r\n.\r\n"
 
-    while True:
-        #Wait for inbound client connection(s)
-        print('Ready to serve...\n')
-        clientConnectionSocket, clientAddr = serverSocket.accept()
-        try:
-            
-            #Parse inbound HTTP Request Headers 
-            message = clientConnectionSocket.recv(BUFFER_SIZE)
-            _, headers = message.split(b'\r\n', 1)
-            headerBytes = BytesParser().parsebytes(headers)
-            headers = dict(headerBytes.items())
-            print("Request Headers:\n")
-            pprint.pprint(headers, width=160)
-            print("")
+    # Choose a mail server (e.g. Google mail server) if you want to verify the script beyond GradeScope
+    mailserver = ("mail.digisync.com", 10587)    
 
-            #Parse filename from HTTP Request
-            filename = message.split()[1]
-            print("File requested: %s\n" % filename.decode())
-            f = open(filename[1:])
-            outputdata = f.read()
+    # Create socket called clientSocket and establish a TCP connection with mailserver and port
 
-            #Send HTTP headers line into socket
-            response = 'HTTP/1.1 200 OK\r\n'
-            response += 'Content-Type: text/html\n'
-            response += '\n'
-            clientConnectionSocket.send(response.encode()) 
+    clientSocket = socket(AF_INET, SOCK_STREAM)
+    clientSocket.connect(mailserver)    
 
-            #Send the content of the requested file to the client
-            for i in range(0, len(outputdata)):
-                clientConnectionSocket.send(outputdata[i].encode())
+    recv = clientSocket.recv(1024).decode()
+    print(recv)
+    if recv[:3] != '220':
+        print('220 reply not received from server.')
 
-            clientConnectionSocket.send("\r\n".encode())
-            clientConnectionSocket.close()
-        except IOError:
-            #Send response message for file not found (404)
-            err = '404 Not Found'
-            clientConnectionSocket.sendall(err.encode())
+    # Send HELO command and print server response.
+    heloCommand = 'EHLO localhost\r\n'
+    clientSocket.send(heloCommand.encode())
+    recv1 = clientSocket.recv(1024).decode()
+    print(recv1)
+    if recv1[:3] != '250':
+        print('250 reply not received from server.')
 
-            #Close client socket
-            clientConnectionSocket.close()
+    # Send MAIL FROM command and print server response.
+    fromCommand = 'MAIL FROM: nk3338@nyu.edu\r\n'
+    clientSocket.send(fromCommand.encode())
+    recv1 = clientSocket.recv(1024).decode()
+    print(recv1)
+    if recv1[:3] != '250':
+        print('250 reply not received from server.')
 
-    serverSocket.close()
-    sys.exit()  # Terminate the program after sending the corresponding data
+    # Send RCPT TO command and print server response.
+    rcptCommand = 'RCPT TO: localhost@localhost.com\r\n'
+    clientSocket.send(rcptCommand.encode())
+    recv1 = clientSocket.recv(1024).decode()
+    print(recv1)
+    if recv1[:3] != '250':
+        print('250 reply not received from server.')
 
-if __name__ == "__main__":
-    webServer(13331)
+    # Send DATA command and print server response.
+    dataCommand = 'DATA\r\n'
+    clientSocket.send(dataCommand.encode())
+    recv1 = clientSocket.recv(1024).decode()
+    print(recv1)
+    if recv1[:3] != '250':
+        print('250 reply not received from server.')
 
+    # Send message data.
+    data = 'This is user nk3338\r\n'
+    clientSocket.send(data.encode())
+    recv1 = clientSocket.recv(1024).decode()
+    print(recv1)
+    if recv1[:3] != '354':
+        print('354 reply not received from server.')
+
+    # Message ends with a single period.
+    periodCommand = '.\r\n'
+    clientSocket.send(periodCommand.encode())
+    recv1 = clientSocket.recv(1024).decode()
+    print(recv1)
+    if recv1[:3] != '250':
+        print('250 reply not received from server.')
+
+    # Send QUIT command and get server response.
+    quitCommand = 'QUIT\r\n'
+    clientSocket.send(quitCommand.encode())
+    recv1 = clientSocket.recv(1024).decode()
+    print(recv1)
+    if recv1[:3] != '221':
+        print('221 reply not received from server.')
+
+
+if __name__ == '__main__':
+    smtp_client(1025, '127.0.0.1')
