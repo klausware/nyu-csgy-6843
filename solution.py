@@ -2,7 +2,7 @@ import socket
 
 
 def smtp_client(port=1025, mailserver='127.0.0.1'):
-    msg = "\r\nThis is student nk3338"
+    msg = "\r\nThis is student nk3338\r\n"
     endmsg = "\r\n.\r\n"
 
     # Choose a mail server (e.g. Google mail server) if you want to verify the script beyond GradeScope    
@@ -37,7 +37,7 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
         #print('2. 250 reply not received from server.')
 
     # Send RCPT TO command and print server response.
-    rcptCommand = 'RCPT TO: test@local.edu\r\n'
+    rcptCommand = 'RCPT TO: test@blackcatsecurity.com\r\n'
     clientSocket.send(rcptCommand.encode())
     recv1 = clientSocket.recv(1024).decode()
     #print(recv1)
@@ -57,10 +57,6 @@ def smtp_client(port=1025, mailserver='127.0.0.1'):
     # Send message data.
     data = msg
     clientSocket.send(data.encode())
-    #recv1 = clientSocket.recv(1024).decode()
-    #print(recv1)
-    #if recv1[:3] != '354':
-        #print('354 reply not received from server.')
 
     # Message ends with a single period.
     periodCommand = endmsg
