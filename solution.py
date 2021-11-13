@@ -47,9 +47,30 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         timeReceived = time.time()
         recPacket, addr = mySocket.recvfrom(1024)
 
-        # Fill in start
+        #8 bits to a byte and ICMP header is bits 160-192
+        #So we want the 20th byte in the IP header
+        #Unpack requires a buffer of 8 bytes so we grab the 20th - 28th bytes
+        header = recPacket[20:28]
+        
+        tmp = struct.unpack("bbHHh", header)
+        print(tmp)
+        
+        #bbHHh are struct unpack's format characters
+        #(type): b - signed char int
+        #(code): b - signed char int
+        #(checksum): H - unsigned short int
+        #(packetID): H - unsigned short int
+        #(seq): h - short int     
+        #We unpack the icmp header into the respective variables
+        (type, code, checksum, packetID, seq) = struct.unpack("bbHHh", header)
 
-        # Fetch the ICMP header from the IP packet
+        timeLeft = timeLeft - howLongInSelect
+        if timeLeft <=0:
+            return "Request timed out"		
+        else:
+            timeSent = struct.unpack("q", recPacket[28:36])
+            print("Time sent is: %s" % timeSent)
+            #return timeReceived - timeSent
 
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
@@ -105,9 +126,9 @@ def ping(host, timeout=1):
     dest = gethostbyname(host)
     print("Pinging " + dest + " using Python:")
     print("")
-    # Calculate vars values and return them
-    #  vars = [str(round(packet_min, 2)), str(round(packet_avg, 2)), str(round(packet_max, 2)),str(round(stdev(stdev_var), 2))]
-    # Send ping requests to a server separated by approximately one second
+    #Calculate vars values and return them
+    #vars = [str(round(packet_min, 2)), str(round(packet_avg, 2)), str(round(packet_max, 2)),str(round(stdev(stdev_var), 2))]
+    #Send ping requests to a server separated by approximately one second
     for i in range(0,4):
         delay = doOnePing(dest, timeout)
         print(delay)
@@ -119,3 +140,4 @@ if __name__ == '__main__':
     ping("google.co.il")
     #ping("127.0.0.1")
     #ping("google.com")
+    #ping("no.no.e")
