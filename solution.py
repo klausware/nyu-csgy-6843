@@ -46,32 +46,39 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
 
         timeReceived = time.time()
         recPacket, addr = mySocket.recvfrom(1024)
-
-        #8 bits to a byte and ICMP header is bits 160-192
-        #So we want the 20th byte in the IP header
-        #Unpack requires a buffer of 8 bytes so we grab the 20th - 28th bytes
+        
+        ''' 
+        8 bits to a byte and ICMP header is bits 160-192
+        So we want the 20th byte in the IP header
+        Unpack requires a buffer of 8 bytes so we grab the 20th - 28th bytes
+        '''
         header = recPacket[20:28]
+        timeSentHeader = recPacket[28:36]
+
+        #Spit out contents of unpacked headers for visibility
+        #print(struct.unpack("bbHHh", header))
+        #print(struct.unpack("q", timeSentHeader))
         
-        tmp = struct.unpack("bbHHh", header)
-        #print(tmp)
-        
-        #bbHHh are struct unpack's format characters
-        #(type): b - signed char int
-        #(code): b - signed char int
-        #(checksum): H - unsigned short int
-        #(packetID): H - unsigned short int
-        #(seq): h - short int     
-        #We unpack the icmp header into the respective variables
+        '''      
+        bbHHh are struct unpack's format characters
+        (type): b - signed char int
+        (code): b - signed char int
+        (checksum): H - unsigned short int
+        (packetID): H - unsigned short int
+        (seq): h - short int     
+        We unpack the icmp header into the respective variables
+        '''
         (type, code, checksum, packetID, seq) = struct.unpack("bbHHh", header)
 
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <=0:
-            #print("Time left is: %s" % timeLeft)
+            print("Time left is: %s" % timeLeft)
             return "Request timed out"		
-        else:
-            timeSent = struct.unpack("q", recPacket[28:36])
-            #print("Time sent is: %s" % timeSent)
-            #return timeReceived - timeSent
+        
+        timeSentHeaderPadded = recPacket[28:28 + struct.calcsize("d")]
+        timeSent = struct.unpack("q", timeSentHeaderPadded)[0]
+        print("Time sent is: %s" % timeSent)
+        return timeReceived - timeSent
 
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
