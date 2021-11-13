@@ -53,7 +53,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         header = recPacket[20:28]
         
         tmp = struct.unpack("bbHHh", header)
-        print(tmp)
+        #print(tmp)
         
         #bbHHh are struct unpack's format characters
         #(type): b - signed char int
@@ -66,10 +66,11 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
 
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <=0:
+            #print("Time left is: %s" % timeLeft)
             return "Request timed out"		
         else:
             timeSent = struct.unpack("q", recPacket[28:36])
-            print("Time sent is: %s" % timeSent)
+            #print("Time sent is: %s" % timeSent)
             #return timeReceived - timeSent
 
         # Fill in end
