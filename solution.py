@@ -70,15 +70,16 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         '''
         (type, code, checksum, packetID, seq) = struct.unpack("bbHHh", header)
 
+        timeSentHeaderPadded = recPacket[28:28 + struct.calcsize("d")]
+        timeSent = struct.unpack("d", timeSentHeaderPadded)[0]
+
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <=0:
             print("Time left is: %s" % timeLeft)
             return "Request timed out"		
-        
-        timeSentHeaderPadded = recPacket[28:28 + struct.calcsize("d")]
-        timeSent = struct.unpack("q", timeSentHeaderPadded)[0]
-        print("Time sent is: %s" % timeSent)
-        return timeReceived - timeSent
+        else: 
+            print("Time sent is: %s" % timeSent)
+            return timeReceived - timeSent
 
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
