@@ -5,6 +5,7 @@ import struct
 import time
 import select
 import binascii
+import statistics as stat
 # Should use stdev
 
 ICMP_ECHO_REQUEST = 8
@@ -43,7 +44,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         howLongInSelect = (time.time() - startedSelect)
         if whatReady[0] == []:  # Timeout
             return "Request timed out."
-
+        
         timeReceived = time.time()
         recPacket, addr = mySocket.recvfrom(1024)
         
@@ -75,16 +76,14 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
 
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <=0:
-            print("Time left is: %s" % timeLeft)
+            #print("Time left is: %s" % timeLeft)
             return "Request timed out"		
         else: 
-            print("Time sent is: %s" % timeSent)
-            return timeReceived - timeSent
+            #print("Time sent is: %s" % timeSent)
+            delay = timeReceived - timeSent
+            return delay
 
-        # Fill in end
-        timeLeft = timeLeft - howLongInSelect
-        if timeLeft <= 0:
-            return "Request timed out."
+ 
 
 
 def sendOnePing(mySocket, destAddr, ID):
@@ -135,14 +134,34 @@ def ping(host, timeout=1):
     dest = gethostbyname(host)
     print("Pinging " + dest + " using Python:")
     print("")
+    delayTimes = []
     #Calculate vars values and return them
     #vars = [str(round(packet_min, 2)), str(round(packet_avg, 2)), str(round(packet_max, 2)),str(round(stdev(stdev_var), 2))]
     #Send ping requests to a server separated by approximately one second
     for i in range(0,4):
         delay = doOnePing(dest, timeout)
+        delayTimes.append(delay*1000)
         print(delay)
         time.sleep(1)  # one second
-
+    
+    print(delayTimes)
+    #delayTimes = delayTimes.sort
+    #print(delayTimes)
+    
+    packet_min = min(delayTimes)
+    print("min: %i" % packet_min)
+    
+    packet_avg = sum(delayTimes) / len(delayTimes)
+    print("avg: %i" % packet_avg) 
+    
+    packet_max = max(delayTimes) 
+    print("max: %i" % packet_max)
+    
+    stdev_var = stat.stdev(delayTimes)
+    print("stddev = %i" % stdev_var)
+    
+    vars = [str(round(packet_min, 2)), str(round(packet_avg, 2)), str(round(packet_max, 2)),str(round(stdev(stdev_var), 2))]  
+    
     return vars
 
 if __name__ == '__main__':
