@@ -50,18 +50,23 @@ def build_packet():
     header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, ID, 1)
     data = struct.pack("d", time.time())
     myChecksum = checksum(header + data)
+    if sys.platform == 'darwin':
+        myChecksum = htons(myChecksum) & 0xffff
+        #Convert 16-bit integers from host to network byte order.
+    else:
+        myChecksum = htons(myChecksum)
     header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, ID, 1)
     packet = header + data
     return packet
 
 def get_route(hostname):
-    timeLeft = TIMEOUT
     tracelist1 = [] #This is your list to use when iterating through each trace 
     tracelist2 = [] #This is your list to contain all traces
 
     print("Begin traceroute to " + hostname + "(" + gethostbyname(hostname) + ")")
     for ttl in range(1,MAX_HOPS):
         for tries in range(TRIES):
+            timeLeft = TIMEOUT 
             destAddr = gethostbyname(hostname)
             icmp = getprotobyname("icmp")
             mySocket = socket(AF_INET, SOCK_RAW, icmp)
@@ -79,7 +84,7 @@ def get_route(hostname):
                     tracelist1 = ([str(ttl), "*", "Request timed out"])
                     tracelist2.append(tracelist1)
                     print("\t*\t\t*\t\t*\t\tRequest timed out.") 
-                    continue
+                    #continue
                 recvPacket, addr = mySocket.recvfrom(1024)
                 timeReceived = time.time()
                 timeLeft = timeLeft - howLongInSelect
@@ -130,4 +135,4 @@ def get_route(hostname):
     return tracelist2
 
 if __name__ == '__main__':
-    get_route("google.com")
+    get_route("www.google.com")
