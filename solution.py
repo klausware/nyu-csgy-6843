@@ -90,7 +90,7 @@ def get_route(hostname):
                 try: #try to fetch the hostname
                     #Fill in start
                     #Fill in end
-                    host = gethostbyhostname(addr[0])
+                    host = gethostbyname(addr[0])
                     print("Hostname: " % host)
                 except error:   #if the host does not provide a hostname
                     #Fill in start
