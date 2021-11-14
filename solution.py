@@ -106,7 +106,7 @@ def get_route(hostname):
                     #Fill in start
                     #You should add your responses to your lists here
                     #Fill in end
-                    tracelist1 = ([str(ttl), str((timeReceived - t)*1000), addr[0], host])
+                    tracelist1 = ([str(ttl), str((timeReceived - t)*1000)+'ms', addr[0], host])
                     #print(tracelist1)
                     tracelist2.append(tracelist1)
                     print("%d\t%.0fms " " %s " " %s" %(ttl, (timeReceived -t)*1000, addr[0], host))
@@ -116,7 +116,7 @@ def get_route(hostname):
                     #Fill in start
                     #You should add your responses to your lists here 
                     #Fill in end
-                    tracelist1 = ([str(ttl), str((timeReceived - t)*1000), addr[0], host])
+                    tracelist1 = ([str(ttl), str((timeReceived - t)*1000)+'ms', addr[0], host])
                     tracelist2.append(tracelist1)
                     print("%d\t%.0fms " " %s " " %s" %(ttl, (timeReceived -t)*1000, addr[0], host))
                 elif types == 0:
@@ -125,7 +125,7 @@ def get_route(hostname):
                     #Fill in start
                     #You should add your responses to your lists here and return your list if your destination IP is met
                     #Fill in end
-                    tracelist1 = ([str(ttl), str((timeReceived - t)*1000), addr[0], host])
+                    tracelist1 = ([str(ttl), str((timeReceived - t)*1000)+'ms', addr[0], host])
                     tracelist2.append(tracelist1)
                     print("%d\t%.0fms " " %s " " %s" %(ttl, (timeReceived -t)*1000, addr[0], host))
                 else:
