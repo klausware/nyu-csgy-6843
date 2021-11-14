@@ -44,12 +44,11 @@ def build_packet():
     # then finally the complete packet was sent to the destination.
 
     # Make the header in a similar way to the ping exercise.
-    # Append checksum to the header.
-
-    # Don’t send the packet yet , just return the final packet in this function.
-    #Fill in end
-
-    # So the function ending should look like this
+    # Code copied from Pinger lab skeleton solution.py pretty much verbatim
+    myChecksum = 0
+    header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, ID, 1)
+    data = struct.pack("d", time.time())
+    myChecksum = checksum(header + data)
 
     packet = header + data
     return packet
@@ -63,71 +62,67 @@ def get_route(hostname):
         for tries in range(TRIES):
             destAddr = gethostbyname(hostname)
 
-            #Fill in start
-            # Make a raw socket named mySocket
-            #Fill in end
-
+            mySocket = socket(AF_INET, SOCK_RAW, icmp)
             mySocket.setsockopt(IPPROTO_IP, IP_TTL, struct.pack('I', ttl))
             mySocket.settimeout(TIMEOUT)
             try:
                 d = build_packet()
                 mySocket.sendto(d, (hostname, 0))
-                t= time.time()
+                t = time.time()
                 startedSelect = time.time()
                 whatReady = select.select([mySocket], [], [], timeLeft)
                 howLongInSelect = (time.time() - startedSelect)
                 if whatReady[0] == []: # Timeout
                     tracelist1.append("* * * Request timed out.")
-                    #Fill in start
-                    #You should add the list above to your all traces list
-                    #Fill in end
+                    tracelist2.append(tracelist1)
                 recvPacket, addr = mySocket.recvfrom(1024)
                 timeReceived = time.time()
                 timeLeft = timeLeft - howLongInSelect
                 if timeLeft <= 0:
                     tracelist1.append("* * * Request timed out.")
-                    #Fill in start
-                    #You should add the list above to your all traces list
-                    #Fill in end
+                    tracelist2.append(tracelist1)
             except timeout:
                 continue
 
             else:
-                #Fill in start
-                #Fetch the icmp type from the IP packet
-                #Fill in end
+                (types, code, checksum, Id, seq) = struct.unpack("bbHHh", recvPacket[20:28])
                 try: #try to fetch the hostname
                     #Fill in start
                     #Fill in end
-                except herror:   #if the host does not provide a hostname
+                    host = gethostbyhostname(addr[0])
+                    print("Hostname: " % host)
+                except error:   #if the host does not provide a hostname
                     #Fill in start
                     #Fill in end
-
+                    host = "hostname not returnable"
                 if types == 11:
                     bytes = struct.calcsize("d")
-                    timeSent = struct.unpack("d", recvPacket[28:28 +
-                    bytes])[0]
+                    timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     #Fill in start
                     #You should add your responses to your lists here
                     #Fill in end
+                    print("Hop = %d\trtt=%.0f ms\tIP = %s\tHost:%s" %(seq, (timeReceived -t)*1000, addr[0], host))
+                    #tracelist2.append()
                 elif types == 3:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     #Fill in start
                     #You should add your responses to your lists here 
                     #Fill in end
+                    print("Hop = %d\trtt=%.0f ms\tIP = %s\tHost:%s" %(seq, (timeReceived -t)*1000, addr[0], host))
                 elif types == 0:
                     bytes = struct.calcsize("d")
                     timeSent = struct.unpack("d", recvPacket[28:28 + bytes])[0]
                     #Fill in start
                     #You should add your responses to your lists here and return your list if your destination IP is met
                     #Fill in end
+                    print("Hop = %d\trtt=%.0f ms\tIP = %s\tHost:%s" %(seq, (timeReceived -t)*1000, addr[0], host))
                 else:
                     #Fill in start
                     #If there is an exception/error to your if statements, you should append that to your list here
                     #Fill in end
+                    print("Exception")
                 break
             finally:
                 mySocket.close()
-
 
