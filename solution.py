@@ -45,6 +45,7 @@ def build_packet():
 
     # Make the header in a similar way to the ping exercise.
     # Code copied from Pinger lab skeleton solution.py pretty much verbatim
+    ID = os.getpid() & 0xFFFF
     myChecksum = 0
     header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, myChecksum, ID, 1)
     data = struct.pack("d", time.time())
@@ -125,4 +126,3 @@ def get_route(hostname):
                 break
             finally:
                 mySocket.close()
-
